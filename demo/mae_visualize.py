@@ -1,44 +1,26 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# ## Masked Autoencoders: Visualization Demo
-# 
-# This is a visualization demo using our pre-trained MAE models. No GPU is needed.
-
-# ### Prepare
-# Check environment. Install packages if in Colab.
-# 
-
-# In[1]:
 
 
-import sys
 import os
-import requests
-
-import torch
-import numpy as np
+import sys
 
 import matplotlib.pyplot as plt
+import numpy as np
+import requests
+import torch
 from PIL import Image
 
-# check whether run in Colab
-if 'google.colab' in sys.modules:
-    print('Running in Colab.')
-    get_ipython().system('pip3 install timm==0.4.5  # 0.3.2 does not work in Colab')
-    get_ipython().system('git clone https://github.com/facebookresearch/mae.git')
-    sys.path.append('./mae')
-else:
-    sys.path.append('..')
+sys.path.append(os.path.abspath('..'))
+
 import models_mae
 
+# %%
 
 # ### Define utils
 
 # In[2]:
 
 
-# define the utils
+# %% define the utils
 
 imagenet_mean = np.array([0.485, 0.456, 0.406])
 imagenet_std = np.array([0.229, 0.224, 0.225])
@@ -101,8 +83,9 @@ def run_one_image(img, model):
     plt.subplot(1, 4, 4)
     show_image(im_paste[0], "reconstruction + visible")
 
-    plt.show()
+    plt.savefig('mae_visualize.png')
 
+# %%
 
 # ### Load an image
 
@@ -125,6 +108,7 @@ img = img / imagenet_std
 plt.rcParams['figure.figsize'] = [5, 5]
 show_image(torch.tensor(img))
 
+# %%
 
 # ### Load a pre-trained MAE model
 
@@ -134,12 +118,16 @@ show_image(torch.tensor(img))
 # This is an MAE model trained with pixels as targets for visualization (ViT-Large, training mask ratio=0.75)
 
 # download checkpoint if not exist
-get_ipython().system('wget -nc https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large.pth')
+!wget -nc https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large.pth
+
+# %%
 
 chkpt_dir = 'mae_visualize_vit_large.pth'
 model_mae = prepare_model(chkpt_dir, 'mae_vit_large_patch16')
 print('Model loaded.')
 
+
+# %%
 
 # ### Run MAE on the image
 
@@ -157,15 +145,20 @@ run_one_image(img, model_mae)
 # In[6]:
 
 
+# %%
 # This is an MAE model trained with an extra GAN loss for more realistic generation (ViT-Large, training mask ratio=0.75)
 
 # download checkpoint if not exist
-get_ipython().system('wget -nc https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large_ganloss.pth')
+!wget -nc https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_large_ganloss.pth
+
+
+# %%
 
 chkpt_dir = 'mae_visualize_vit_large_ganloss.pth'
 model_mae_gan = prepare_model('mae_visualize_vit_large_ganloss.pth', 'mae_vit_large_patch16')
 print('Model loaded.')
 
+# %%
 
 # ### Run MAE on the image
 
@@ -177,7 +170,7 @@ torch.manual_seed(2)
 print('MAE with extra GAN loss:')
 run_one_image(img, model_mae_gan)
 
-
+# %%
 # In[ ]:
 
 
